@@ -1,15 +1,12 @@
 {
-  "name": "medina-aii",
+  "name": "c-lya-ai",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "description": "C-LYA AI Dakwah Platform",
+  "main": "bot.js",
   "type": "commonjs",
+  "scripts": {
+    "start": "node bot.js"
+  },
   "dependencies": {
     "axios": "^1.13.5",
     "dotenv": "^17.3.1",
