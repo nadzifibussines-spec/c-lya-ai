@@ -366,20 +366,19 @@ bot.action(/unlimited_(.+)/, (ctx) => {
   ctx.reply("♾ User sekarang unlimited.");
   ctx.answerCbQuery();
 });
-bot.action(/unlimited_(.+)/, (ctx) => {
+bot.action(/unblock_(.+)/, async (ctx) => {
   const id = ctx.match[1];
 
-  users[id].unlimited = true;
+  if (users[id]) {
+    users[id].blocked = false;
 
-  ctx.reply("♾ User sekarang unlimited.");
-  ctx.answerCbQuery();
-});
-bot.action(/block_(.+)/, (ctx) => {
-  const id = ctx.match[1];
+    await UserDB.updateOne(
+      { telegramId: id },
+      { $set: { blocked: false } }
+    );
+  }
 
-  users[id].blocked = true;
-
-  ctx.reply("🚫 User berhasil diblok.");
+  ctx.reply("✅ User berhasil di-unblock.");
   ctx.answerCbQuery();
 });
 
@@ -395,6 +394,9 @@ bot.hears("🔙 Kembali", (ctx) => {
 // ==============================
 
 bot.on("text", async (ctx) => {
+  if (!ctx.from) return;
+  if (!users[ctx.from.id]) return;
+
   const user = users[ctx.from.id];
   
   // ================= ADMIN STATE PRIORITY =================
@@ -436,15 +438,20 @@ Question: ${u.questionUsed}/${u.questionLimit}
 
   // SET LIMIT STEP 2
   if (state.action === "setLimitValue") {
-    const [fatwa, question] = input.split(" ");
-    const target = state.targetUser;
+  const [fatwa, question] = input.split(" ");
+  const target = state.targetUser;
 
-    users[target].fatwaLimit = parseInt(fatwa);
-    users[target].questionLimit = parseInt(question);
-
+  if (!users[target]) {
     adminState[ctx.from.id] = null;
-    return ctx.reply("✅ Limit berhasil diperbarui.");
+    return ctx.reply("User tidak ditemukan.");
   }
+
+  users[target].fatwaLimit = parseInt(fatwa) || 0;
+  users[target].questionLimit = parseInt(question) || 0;
+
+  adminState[ctx.from.id] = null;
+  return ctx.reply("✅ Limit berhasil diperbarui.");
+}
 
   // BLOCK USER
   if (state.action === "blockUser") {
@@ -511,9 +518,10 @@ Question: ${u.questionUsed}/${u.questionLimit}
 
     ctx.reply(ai.data.choices[0].message.content, mainMenu(user));
 
-  } catch {
-    ctx.reply("System error.");
-  }
+  } catch (err) {
+  console.log("AI ERROR:", err.message);
+  ctx.reply("System error.");
+}
 
 });
 
