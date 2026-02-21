@@ -1,9 +1,22 @@
 require("dotenv").config();
 const { Telegraf, Markup } = require("telegraf");
 const axios = require("axios");
-
+const mongoose = require("mongoose");
 const bot = new Telegraf(process.env.BOT_TOKEN);
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log("✅ MongoDB Connected"))
+  .catch(err => console.log("❌ MongoDB Error:", err));
+  const userSchema = new mongoose.Schema({
+  telegramId: String,
+  username: String,
+  role: String,
+  blocked: Boolean,
+  unlimited: Boolean,
+  totalQuestions: { type: Number, default: 0 },
+  createdAt: { type: Date, default: Date.now }
+});
 
+const UserDB = mongoose.model("User", userSchema);
 const SUPER_ADMIN_ID = 7092312411;
 const DEFAULT_FATWA_LIMIT = 5;
 const DEFAULT_QUESTION_LIMIT = 10;
@@ -179,9 +192,22 @@ bot.start((ctx) => {
 // LOGIN
 // ==============================
 
-bot.hears(/🔐|Login|تسجيل/, (ctx) => {
+bot.hears(/🔐|Login|تسجيل/, async (ctx) => {
   const user = users[ctx.from.id];
   user.registered = true;
+
+  await UserDB.findOneAndUpdate(
+    { telegramId: ctx.from.id },
+    {
+      telegramId: ctx.from.id,
+      username: ctx.from.username || "",
+      role: user.role,
+      blocked: user.blocked,
+      unlimited: user.unlimited
+    },
+    { upsert: true }
+  );
+
   ctx.reply("✅ Login berhasil.", mainMenu(user));
 });
 
@@ -453,6 +479,10 @@ Question: ${u.questionUsed}/${u.questionLimit}
     return ctx.reply(TEXT[user.language].limit);
 
   user.questionUsed++;
+  await UserDB.updateOne(
+  { telegramId: ctx.from.id },
+  { $inc: { totalQuestions: 1 } }
+);
   logActivity(ctx.from.id, ctx.message.text);
 
   await ctx.reply(TEXT[user.language].processing);
