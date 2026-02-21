@@ -93,7 +93,7 @@ function logActivity(userId, action) {
 
 const TEXT = {
   indonesia: {
-    welcome: "🕌 Selamat datang di MEDINA AI",
+    welcome: "🕌 Selamat datang di C-LYA AI",
     login: "🔐 Login",
     ask: "📖 Mulai Bertanya",
     changeLang: "🌍 Ganti Bahasa",
@@ -109,7 +109,7 @@ const TEXT = {
     disclaimer: "⚠ Fatwa berbasis literatur Ahlus Sunnah wal Jama'ah."
   },
   english: {
-    welcome: "🕌 Welcome to MEDINA AI",
+    welcome: "🕌 Welcome to C-LYA AI",
     login: "🔐 Login",
     ask: "📖 Ask Question",
     changeLang: "🌍 Change Language",
@@ -125,7 +125,7 @@ const TEXT = {
     disclaimer: "⚠ Fatwa is literature-based."
   },
   arabic: {
-    welcome: "🕌 مرحبًا بك في MEDINA AI",
+    welcome: "🕌 مرحبًا بك في C-LYA AI",
     login: "🔐 تسجيل الدخول",
     ask: "📖 اطرح سؤالاً",
     changeLang: "🌍 تغيير اللغة",
@@ -526,4 +526,4 @@ Question: ${u.questionUsed}/${u.questionLimit}
 });
 
 bot.launch();
-console.log("🕌 MEDINA AI FULL PROFESSIONAL SYSTEM RUNNING...");
+console.log("🕌 C-LYA AI FULL PROFESSIONAL SYSTEM RUNNING...");
